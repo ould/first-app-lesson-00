@@ -9,20 +9,39 @@ import { HousingService } from '../housing.service';
   standalone: true,
   imports: [CommonModule, HousingLocationComponent],
   template: `
+  <input type="text" placeholder="Filter by city" #filter>
+  <button class="primary" type="button" (click)="filterResults(filter.value)">Search</button>
   <app-housing-location
-  *ngFor="let housingLocation of housingLocationList"
+  *ngFor="let housingLocation of filteredLocationList"
   [housingLocation]="housingLocation">
 </app-housing-location>
+
   `,
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
   
+  filteredLocationList: HousingLocation[] = [];
+
+  filterResults(text: string) {
+    if (!text) {
+      this.filteredLocationList = this.housingLocationList;
+    }
+  
+    this.filteredLocationList = this.housingLocationList.filter(
+      housingLocation => housingLocation?.city.toLowerCase().includes(text.toLowerCase())
+    );
+  }
+
   housingLocationList: HousingLocation[] = [];
   housingService: HousingService = inject(HousingService);
   
   constructor() {
     this.housingLocationList = this.housingService.getAllHousingLocations();
+    this.filteredLocationList = this.housingLocationList;
   }
 
 }
+
+
+// pour le #filter : This example uses a template reference variable to get access to the input element as its value
